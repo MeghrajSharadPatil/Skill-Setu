@@ -5,6 +5,8 @@ const app = express();
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
+const router = express.Router();
+
 function getGeminiClient(): GoogleGenAI | null {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
@@ -23,8 +25,53 @@ function getGeminiClient(): GoogleGenAI | null {
   }
 }
 
+interface GenerateOptions {
+  contents: any;
+  config?: any;
+}
+
+// Resilient AI generation with automatic fallback to alternative models on 503 high-demand / capacity spikes
+async function generateContentWithRetry(
+  ai: GoogleGenAI,
+  options: GenerateOptions
+): Promise<string | null> {
+  const modelsToTry = ["gemini-3.8-flash", "gemini-flash-latest", "gemini-3.1-flash-lite"];
+
+  for (let i = 0; i < modelsToTry.length; i++) {
+    const model = modelsToTry[i];
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: options.contents,
+        config: options.config,
+      });
+
+      const text = response.text?.trim();
+      if (text) {
+        return text;
+      }
+    } catch (err: any) {
+      const errMsg = err?.message || String(err);
+      const isTransient =
+        errMsg.includes("503") ||
+        errMsg.includes("high demand") ||
+        errMsg.includes("UNAVAILABLE") ||
+        errMsg.includes("429") ||
+        errMsg.includes("RESOURCE_EXHAUSTED");
+
+      if (isTransient && i < modelsToTry.length - 1) {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        continue;
+      }
+      break;
+    }
+  }
+
+  return null;
+}
+
 // Health check
-app.get("/api/health", (_req: Request, res: Response) => {
+router.get("/health", (_req: Request, res: Response) => {
   res.json({
     status: "ok",
     service: "SkillSetu MoSPI AI Service (Vercel Serverless)",
@@ -34,7 +81,7 @@ app.get("/api/health", (_req: Request, res: Response) => {
 });
 
 // AI Quiz / MCQ Generator endpoint
-app.post("/api/gemini/quiz", async (req: Request, res: Response) => {
+router.post("/gemini/quiz", async (req: Request, res: Response) => {
   try {
     const { content, topic, domain, difficulty = "Intermediate", count = 5 } = req.body;
     const ai = getGeminiClient();
@@ -183,14 +230,28 @@ Requirements:
 });
 
 // AI Competency Gap Analysis & Recommendations
-app.post("/api/gemini/competency-gap", async (req: Request, res: Response) => {
+router.post("/gemini/competency-gap", async (req: Request, res: Response) => {
   try {
     const { profile } = req.body;
     const ai = getGeminiClient();
 
     if (ai) {
       try {
-        const prompt = `As a Senior Workforce Development Advisor at the Capacity Building Commission (CBC) and MoSPI, analyze this official's profile:
+        const isStudent = profile?.userType === "student";
+        const prompt = isStudent
+          ? `As a Senior Academic & Statistical Career Mentor for university students, ISS aspirants, and data scholars, analyze this learner's profile:
+Category: ${profile?.cadre || "Student (Undergraduate/Postgraduate)"}
+Institution / University: ${profile?.ministry || "University"}
+Program / Degree: ${profile?.education || "Statistics & Data Science"}
+Target Career Goal / Exam: ${profile?.targetRole || "Indian Statistical Service (ISS) Examination"}
+Current Competencies: ${JSON.stringify(profile?.competencies || {})}
+
+Provide a structured, encouraging evaluation:
+1. Top 3 urgent skill gaps with rationale based on UPSC ISS exam papers, practical data analysis, and MoSPI statistical standards.
+2. Recommended 3-stage learning sequence (Foundation -> Core Statistical Theory & Coding -> Advanced Problem Solving & Mock Tests).
+3. Estimated study hours per week and key milestones.
+Format as JSON with keys: "gapSummary", "priorityGaps" (array of {domain, skill, gapLevel, actionPlan}), "recommendedTrajectory" (array of string steps), "timeInvestmentHours".`
+          : `As a Senior Workforce Development Advisor at the Capacity Building Commission (CBC) and MoSPI, analyze this official's profile:
 Designation: ${profile?.designation || "Senior Statistical Officer"}
 Cadre: ${profile?.cadre || "Subordinate Statistical Service (SSS)"}
 Department: ${profile?.department || "National Sample Survey (NSS)"}
@@ -204,15 +265,13 @@ Provide a structured, encouraging evaluation:
 3. Estimated study hours per week and key milestones.
 Format as JSON with keys: "gapSummary", "priorityGaps" (array of {domain, skill, gapLevel, actionPlan}), "recommendedTrajectory" (array of string steps), "timeInvestmentHours".`;
 
-        const response = await ai.models.generateContent({
-          model: "gemini-3.8-flash",
+        const rawText = await generateContentWithRetry(ai, {
           contents: prompt,
           config: {
             responseMimeType: "application/json",
           },
         });
 
-        const rawText = response.text?.trim();
         if (rawText) {
           const parsed = JSON.parse(rawText);
           return res.json({ success: true, analysis: parsed, source: "gemini-ai" });
@@ -225,31 +284,31 @@ Format as JSON with keys: "gapSummary", "priorityGaps" (array of {domain, skill,
     res.json({
       success: true,
       analysis: {
-        gapSummary: "Officer demonstrates solid foundation in classical survey methodologies and field administration, but requires targeted upskilling in Python for statistical computing, modern GIS spatial layering, and SNA 2008 base revisions.",
+        gapSummary: "Learner demonstrates solid foundational understanding, but requires targeted upskilling in Python/R for statistical computing, modern survey sampling theory, and official dataset wrangling.",
         priorityGaps: [
           {
             domain: "Technical Competencies",
             skill: "Python & R for Official Statistics",
             gapLevel: "High (-2.0)",
-            actionPlan: "Enroll in NSSTA TPAC-approved Python for Data Wrangling & Web Scraping module on iGOT Karmayogi."
+            actionPlan: "Complete modules on NSS data wrangling, pandas, and automated data validation scripts."
           },
           {
             domain: "Statistical Competencies",
             skill: "Modern System of National Accounts (SNA 2008)",
             gapLevel: "Moderate (-1.5)",
-            actionPlan: "Complete National Accounts Division (NAD) certification on Gross Value Added (GVA) compilation."
+            actionPlan: "Study National Accounts Division (NAD) methodology on Gross Value Added (GVA) compilation."
           },
           {
             domain: "Digital Governance",
-            skill: "DPDP Act 2023 & Secure Government Cloud",
+            skill: "DPDP Act 2023 & Statistical Data Ethics",
             gapLevel: "Moderate (-1.2)",
-            actionPlan: "Complete MeitY & CBC Digital Governance micro-course on anonymization protocols."
+            actionPlan: "Complete course on anonymization protocols and official survey privacy safeguards."
           }
         ],
         recommendedTrajectory: [
           "Stage 1: Foundational digital tools (Python data structures, SQL queries on NSS datasets)",
           "Stage 2: Advanced Official Statistics (SNA 2008, GVA estimation, High-frequency CPI compilation)",
-          "Stage 3: Managerial Leadership in Statistical Project Management & Evidence-Based Policy Briefs"
+          "Stage 3: Applied Statistical Analysis & Evidence-Based Policy Briefs"
         ],
         timeInvestmentHours: 36
       },
@@ -262,38 +321,58 @@ Format as JSON with keys: "gapSummary", "priorityGaps" (array of {domain, skill,
 });
 
 // AI Statistical Assistant (Karmayogi Sahayak)
-app.post("/api/gemini/assistant", async (req: Request, res: Response) => {
+router.post("/gemini/assistant", async (req: Request, res: Response) => {
   try {
     const { message, profile } = req.body;
     const ai = getGeminiClient();
 
     if (ai) {
       try {
-        const systemInstruction = `You are 'Karmayogi Statistical Sahayak', the dedicated AI Learning and Competency Mentor for officials in India's Official Statistical System (Ministry of Statistics and Programme Implementation - MoSPI, NSSTA, and State Directorates of Economics and Statistics).
-Provide concise, highly professional, polite, and technically accurate guidance.`;
+        const isStudent = profile?.userType === "student";
+        const systemInstruction = isStudent
+          ? `You are 'Karmayogi Statistical Sahayak', the dedicated AI Learning and Academic Mentor for university students, ISS aspirants, and statistics scholars.
+You possess deep mastery over:
+- UPSC Indian Statistical Service (ISS) examination syllabus and exam strategy.
+- Mathematical Statistics, Probability Theory, Inference, Sampling Theory, Econometrics.
+- India's official statistical infrastructure (MoSPI, NSSO, CSO, PLFS, ASI, CPI, WPI, IIP).
+- Programming in Python and R for data science and official survey datasets.
 
-        const response = await ai.models.generateContent({
-          model: "gemini-3.8-flash",
-          contents: `Current Official Context: Designation: ${profile?.designation || "Statistical Officer"}, Cadre: ${profile?.cadre || "SSS/ISS"}, Department: ${profile?.department || "MoSPI"}.
-User Question: ${message}`,
+Provide encouraging, rigorous, polite, and technically accurate academic guidance with clear bullet points.`
+          : `You are 'Karmayogi Statistical Sahayak', the dedicated AI Learning and Competency Mentor for officials in India's Official Statistical System (Ministry of Statistics and Programme Implementation - MoSPI, NSSTA, and State Directorates of Economics and Statistics).
+You possess deep mastery over:
+- India's statistical infrastructure (NSSO, CSO, NAD, ESD, PLFS, ASI, CPI, WPI, IIP).
+- Competency frameworks (Statistical, Technical, Digital Governance, Behavioural/Managerial).
+- iGOT Karmayogi course catalogues and NSSTA's TPAC (Training Programme Advisory Committee) calendar.
+- Technical programming in Python, R, Stata, SQL for survey data cleaning, weighting, and imputation.
+- Administrative norms of the Indian Statistical Service (ISS) and Subordinate Statistical Service (SSS).
+
+Provide concise, highly professional, polite, and technically accurate guidance. Use bullet points where appropriate. Always support the official's continuous capacity building.`;
+
+        const userContext = isStudent
+          ? `Category: ${profile?.cadre || "Student"}, University: ${profile?.ministry || "University"}, Program: ${profile?.education || "Statistics"}, Target: ${profile?.targetRole || "ISS Exam"}`
+          : `Designation: ${profile?.designation || "Statistical Officer"}, Cadre: ${profile?.cadre || "SSS/ISS"}, Department: ${profile?.department || "MoSPI"}`;
+
+        const rawText = await generateContentWithRetry(ai, {
+          contents: `Current Context: ${userContext}.\nUser Question: ${message}`,
           config: {
             systemInstruction,
             maxOutputTokens: 1000,
           },
         });
 
-        const replyText = response.text || "I am here to assist your capacity building in India's Official Statistical System.";
-        return res.json({ success: true, reply: replyText });
+        if (rawText) {
+          return res.json({ success: true, reply: rawText, source: "gemini-ai" });
+        }
       } catch (genErr) {
         console.warn("Gemini assistant failed, fallback:", genErr);
       }
     }
 
-    let fallbackReply = `Namaste! As your Karmayogi Statistical Sahayak, I am delighted to support your professional upskilling.
-For your role in MoSPI, I recommend focusing on:
-• **Python & R in Official Statistics**: For streamlining NSS data wrangling and automated validation rules.
-• **SNA 2008 & National Accounts**: To understand Gross Value Added (GVA) compilation across primary, secondary, and tertiary sectors.
-• **iGOT Karmayogi Course**: Check out NSSTA module *'Modern Survey Sampling & Quality Assurance in NSS'* (4.8 ★, 12.5 hrs).`;
+    const fallbackReply = `Namaste! As your Karmayogi Statistical Sahayak, I am delighted to support your learning journey.
+Key recommended areas of focus:
+• **Python & R in Official Statistics**: For data cleaning, exploratory data analysis, and automated validation scripts.
+• **Survey Sampling & Methodologies**: Understanding NSS multi-stage stratified designs and multiplier estimation.
+• **System of National Accounts (SNA 2008)**: Core concepts of Gross Value Added (GVA) and GDP compilation.`;
 
     return res.json({ success: true, reply: fallbackReply });
   } catch (err: any) {
@@ -301,5 +380,9 @@ For your role in MoSPI, I recommend focusing on:
     res.status(500).json({ error: "Failed to generate assistant response" });
   }
 });
+
+// Mount router on both "/api" and "/" so that both Vercel rewritten and unrewritten URLs are handled
+app.use("/api", router);
+app.use("/", router);
 
 export default app;

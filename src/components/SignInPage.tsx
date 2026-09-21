@@ -69,10 +69,32 @@ export const SignInPage: React.FC<SignInPageProps> = ({
           const userEmail = user.email || "user@mospi.gov.in";
           const userName = user.user_metadata?.full_name || user.email?.split("@")[0] || "Statistical Officer";
           
-          const matchedProfile = profiles.find((p) => p.email.toLowerCase() === userEmail.toLowerCase()) || {
-            ...profiles[0],
+          const savedProfileStr = localStorage.getItem("skillsetu_user_profile_" + userEmail.toLowerCase());
+          let savedProfile: OfficialProfile | null = null;
+          if (savedProfileStr) {
+            try {
+              savedProfile = JSON.parse(savedProfileStr);
+            } catch {
+              // ignore
+            }
+          }
+
+          const matchedProfile: OfficialProfile = savedProfile || {
+            id: user.id || "user-" + Math.random().toString(36).substring(2, 9),
             name: userName,
             email: userEmail,
+            designation: "",
+            cadre: "Subordinate Statistical Service (SSS)",
+            department: "",
+            ministry: "Ministry of Statistics and Programme Implementation (MoSPI)",
+            currentAssignment: "",
+            experienceYears: 0,
+            education: "",
+            targetRole: "",
+            karmayogiId: "",
+            completedHours: 0,
+            allocatedHours: 40,
+            certificatesEarned: 0,
             authProvider: (user.app_metadata?.provider as "google" | "email") || "email",
             lastLoginAt: new Date().toLocaleTimeString(),
             authSessionId: data.session.access_token.slice(0, 16) + "...",
@@ -114,22 +136,33 @@ export const SignInPage: React.FC<SignInPageProps> = ({
         });
         
         setTimeout(() => {
-          const googleProfile: OfficialProfile = {
+          const userEmail = "officer@gov.in";
+          const savedProfileStr = localStorage.getItem("skillsetu_user_profile_" + userEmail.toLowerCase());
+          let savedProfile: OfficialProfile | null = null;
+          if (savedProfileStr) {
+            try {
+              savedProfile = JSON.parse(savedProfileStr);
+            } catch {
+              // ignore
+            }
+          }
+
+          const googleProfile: OfficialProfile = savedProfile || {
             id: "google-officer",
-            name: "Dr. Rajesh Sharma (Google SSO)",
-            email: "rajesh.sharma.iss@gmail.com",
-            designation: "Senior Statistical Officer (SSO)",
+            name: "Statistical Officer",
+            email: userEmail,
+            designation: "",
             cadre: "Subordinate Statistical Service (SSS)",
-            department: "National Sample Survey (NSS) - Survey Design & Research Division (SDRD)",
+            department: "",
             ministry: "Ministry of Statistics and Programme Implementation (MoSPI)",
-            currentAssignment: "79th Round Socio-Economic Survey Methodology",
-            experienceYears: 7,
-            education: "M.Sc. Statistics (Delhi University)",
-            targetRole: "Assistant Director (Data Analytics)",
-            karmayogiId: "KY-GOOGLE-2024-8842",
-            completedHours: 38.5,
-            allocatedHours: 60,
-            certificatesEarned: 5,
+            currentAssignment: "",
+            experienceYears: 0,
+            education: "",
+            targetRole: "",
+            karmayogiId: "",
+            completedHours: 0,
+            allocatedHours: 40,
+            certificatesEarned: 0,
             authProvider: "google",
             lastLoginAt: new Date().toLocaleTimeString(),
             authSessionId: "GOOG-AUTH-" + Math.random().toString(36).substring(2, 10).toUpperCase(),

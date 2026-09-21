@@ -74,12 +74,33 @@ export const SignIn: React.FC<SignInProps> = ({
         window.history.pushState({}, "", "/");
 
         const user = data.session.user;
-        const matchedProfile: OfficialProfile = profiles.find(
-          (p) => p.email.toLowerCase() === (user.email || "").toLowerCase()
-        ) || {
-          ...profiles[0],
-          name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Statistical Officer",
-          email: user.email || email,
+        const userEmail = (user.email || email).trim();
+        const savedProfileStr = localStorage.getItem("skillsetu_user_profile_" + userEmail.toLowerCase());
+        let savedProfile: OfficialProfile | null = null;
+        if (savedProfileStr) {
+          try {
+            savedProfile = JSON.parse(savedProfileStr);
+          } catch {
+            // ignore
+          }
+        }
+
+        const matchedProfile: OfficialProfile = savedProfile || {
+          id: user.id || "user-" + Math.random().toString(36).substring(2, 9),
+          name: user.user_metadata?.full_name || userEmail.split("@")[0] || "Statistical Officer",
+          email: userEmail,
+          designation: "",
+          cadre: "Subordinate Statistical Service (SSS)",
+          department: "",
+          ministry: "Ministry of Statistics and Programme Implementation (MoSPI)",
+          currentAssignment: "",
+          experienceYears: 0,
+          education: "",
+          targetRole: "",
+          karmayogiId: "",
+          completedHours: 0,
+          allocatedHours: 40,
+          certificatesEarned: 0,
           authProvider: "email",
           lastLoginAt: new Date().toLocaleTimeString(),
           authSessionId: data.session.access_token.slice(0, 18) + "...",

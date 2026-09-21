@@ -70,11 +70,35 @@ export default function App() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           const user = session.user;
-          const userEmail = user.email || "";
-          const matchedProfile = profiles.find((p) => p.email.toLowerCase() === userEmail.toLowerCase()) || {
-            ...profiles[0],
-            name: user.user_metadata?.full_name || user.email?.split("@")[0] || "Statistical Officer",
+          const userEmail = (user.email || "").trim();
+          
+          // Check if user has saved profile locally
+          const savedProfileStr = localStorage.getItem("skillsetu_user_profile_" + userEmail.toLowerCase());
+          let savedProfile: OfficialProfile | null = null;
+          if (savedProfileStr) {
+            try {
+              savedProfile = JSON.parse(savedProfileStr);
+            } catch {
+              // ignore
+            }
+          }
+
+          const matchedProfile: OfficialProfile = savedProfile || {
+            id: user.id || "user-" + Math.random().toString(36).substring(2, 9),
+            name: user.user_metadata?.full_name || userEmail.split("@")[0] || "Statistical Officer",
             email: userEmail,
+            designation: "",
+            cadre: "Subordinate Statistical Service (SSS)",
+            department: "",
+            ministry: "Ministry of Statistics and Programme Implementation (MoSPI)",
+            currentAssignment: "",
+            experienceYears: 0,
+            education: "",
+            targetRole: "",
+            karmayogiId: "",
+            completedHours: 0,
+            allocatedHours: 40,
+            certificatesEarned: 0,
             authProvider: (user.app_metadata?.provider as "google" | "email") || "email",
             lastLoginAt: new Date().toLocaleTimeString(),
             authSessionId: session.access_token.slice(0, 16) + "...",
@@ -114,21 +138,30 @@ export default function App() {
     };
   }, []);
 
-  // Switch officer profile
-  const handleSelectProfile = (newProfile: OfficialProfile) => {
-    setCurrentProfile(newProfile);
+  // Update officer profile & persist
+  const handleUpdateProfile = (updatedProfile: OfficialProfile) => {
+    setCurrentProfile(updatedProfile);
+    if (updatedProfile.email) {
+      localStorage.setItem(
+        "skillsetu_user_profile_" + updatedProfile.email.toLowerCase(),
+        JSON.stringify(updatedProfile)
+      );
+    }
   };
 
   // Sign In handler
   const handleSignIn = (profile: OfficialProfile) => {
-    setCurrentProfile(profile);
-    setProfiles((prev) => {
-      const exists = prev.some((p) => p.id === profile.id || p.email.toLowerCase() === profile.email.toLowerCase());
-      if (exists) {
-        return prev.map((p) => (p.id === profile.id || p.email.toLowerCase() === profile.email.toLowerCase() ? profile : p));
+    const userEmail = (profile.email || "").toLowerCase();
+    const savedProfileStr = localStorage.getItem("skillsetu_user_profile_" + userEmail);
+    let finalProfile = profile;
+    if (savedProfileStr) {
+      try {
+        finalProfile = { ...profile, ...JSON.parse(savedProfileStr) };
+      } catch {
+        // ignore
       }
-      return [profile, ...prev];
-    });
+    }
+    setCurrentProfile(finalProfile);
     setIsAuthenticated(true);
     setIsSignInOpen(false);
     window.history.pushState({}, "", "/");
@@ -298,8 +331,6 @@ export default function App() {
       {/* 1. Official Government Top Header */}
       <GovHeader
         currentProfile={currentProfile}
-        profiles={profiles}
-        onSelectProfile={handleSelectProfile}
         isAuthenticated={isAuthenticated}
         onOpenSignIn={() => setIsSignInOpen(true)}
         onOpenProfile={() => setIsProfileOpen(true)}
@@ -362,24 +393,29 @@ export default function App() {
               onNavigateTab={(tab) => setActiveTab(tab)}
             />
 
-            {/* Quick Officer Snapshot Card / Guest Sign In Banner */}
+            {/* Quick Officer / Student Snapshot Card / Guest Sign In Banner */}
             {isAuthenticated ? (
               <div className="bg-white rounded-xl shadow-xs border border-slate-200 p-5 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div className="flex items-center space-x-3.5">
                   <button
                     onClick={() => setIsProfileOpen(true)}
-                    className="w-12 h-12 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0B4F9C] flex items-center justify-center font-extrabold text-lg transition cursor-pointer shadow-xs"
-                    title="Click to view full officer profile"
+                    className="w-12 h-12 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 text-[#0B4F9C] flex items-center justify-center font-extrabold text-lg transition cursor-pointer shadow-xs shrink-0"
+                    title="Click to view full profile"
                   >
-                    {currentProfile.name.split(" ")[1]?.[0] || "O"}
+                    {currentProfile.name.split(" ")[1]?.[0] || currentProfile.name[0] || "U"}
                   </button>
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+                        currentProfile.userType === "student"
+                          ? "bg-emerald-100 text-emerald-800 border border-emerald-200"
+                          : "bg-amber-100 text-amber-800"
+                      }`}>
                         {currentProfile.cadre}
                       </span>
                       <span className="text-xs text-slate-500 font-mono">
-                        Karmayogi ID: {currentProfile.karmayogiId}
+                        {currentProfile.userType === "student" ? "Roll / ID: " : "Karmayogi ID: "}
+                        {currentProfile.karmayogiId || (currentProfile.userType === "student" ? "Enrolled Student" : "Active Officer")}
                       </span>
                     </div>
                     <h3 className="text-base font-extrabold text-slate-900 mt-0.5 flex items-center gap-2">
@@ -392,7 +428,17 @@ export default function App() {
                       </button>
                     </h3>
                     <p className="text-xs text-slate-600">
-                      {currentProfile.designation} • {currentProfile.department}
+                      {currentProfile.userType === "student" ? (
+                        <span>
+                          {currentProfile.education || currentProfile.designation || "Statistics Scholar"}
+                          {currentProfile.ministry ? ` • ${currentProfile.ministry}` : ""}
+                        </span>
+                      ) : (
+                        <span>
+                          {currentProfile.designation || "Statistical Officer"}
+                          {currentProfile.department ? ` • ${currentProfile.department}` : (currentProfile.ministry ? ` • ${currentProfile.ministry}` : "")}
+                        </span>
+                      )}
                     </p>
                   </div>
                 </div>
@@ -403,14 +449,22 @@ export default function App() {
                     className="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black px-4 py-2 rounded-lg transition shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-slate-950" />
-                    Solve MCQs to Identify Gaps & Get Courses →
+                    <span>
+                      {currentProfile.userType === "student" 
+                        ? "Take Practice MCQs & Diagnostic →" 
+                        : "Solve MCQs to Identify Gaps & Get Courses →"}
+                    </span>
                   </button>
                   <button
                     onClick={() => setActiveTab("pathways")}
                     className="bg-[#0B4F9C] hover:bg-[#083a75] text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-2xs flex items-center gap-1 cursor-pointer"
                   >
                     <BookOpen className="w-3.5 h-3.5" />
-                    View Allocated Courses ({courses.filter(c => c.isAllocated).length})
+                    <span>
+                      {currentProfile.userType === "student" 
+                        ? `Study Courses (${courses.filter(c => c.isAllocated).length})` 
+                        : `View Allocated Courses (${courses.filter(c => c.isAllocated).length})`}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -628,7 +682,7 @@ export default function App() {
           <div className="space-y-2">
             <div className="font-bold text-white text-sm">Security & Compliance</div>
             <p className="text-slate-400 text-xs leading-relaxed">
-              Hosted on MeghRaj Cloud Infrastructure. Compliant with Government of India Cyber Security Guidelines and
+              Hosted on National Informatics Centre (NIC) Government Cloud Infrastructure. Compliant with Government of India Cyber Security Guidelines and
               GIGW (Guidelines for Indian Government Websites) 3.0.
             </p>
             <div className="pt-2 text-[10px] text-slate-500 font-mono">
@@ -665,9 +719,8 @@ export default function App() {
         isOpen={isProfileOpen}
         onClose={() => setIsProfileOpen(false)}
         profile={currentProfile}
-        profiles={profiles}
-        onSelectProfile={handleSelectProfile}
         onSignOut={handleSignOut}
+        onUpdateProfile={handleUpdateProfile}
         language={language}
       />
 

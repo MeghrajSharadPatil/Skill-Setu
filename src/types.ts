@@ -15,19 +15,29 @@ export interface SkillItem {
   recentAssessmentScore?: number;
 }
 
+export type UserProfileType = "official" | "student";
+
 export interface OfficialProfile {
   id: string;
   name: string;
   email: string;
+  userType?: UserProfileType;
   designation: string;
-  cadre: "Indian Statistical Service (ISS)" | "Subordinate Statistical Service (SSS)" | "State DES Official" | "General Central Service";
-  department: string; // e.g. "National Sample Survey (NSS) - Field Operations Division (FOD)"
-  ministry: string; // "Ministry of Statistics and Programme Implementation (MoSPI)"
-  currentAssignment: string;
-  experienceYears: number;
-  education: string;
-  targetRole: string;
-  karmayogiId: string;
+  cadre: 
+    | "Indian Statistical Service (ISS)" 
+    | "Subordinate Statistical Service (SSS)" 
+    | "State DES Official" 
+    | "General Central Service"
+    | "Student (Undergraduate/Postgraduate)"
+    | "Research Scholar / Ph.D."
+    | "Civil Services / ISS Aspirant";
+  department: string; // e.g. "Department of Statistics & Mathematics" or "Field Operations Division (FOD)"
+  ministry: string; // for official: "Ministry of Statistics and PI", for student: "University / College / Institute"
+  currentAssignment: string; // for official: "Annual Survey of Industries", for student: "ISS Exam Preparation / Academic Studies"
+  experienceYears: number; // for official: years of service, for student: year of study (1-5)
+  education: string; // e.g. "B.Sc. Statistics", "M.Sc. Data Science", "Ph.D. Economics"
+  targetRole: string; // e.g. "Indian Statistical Service (ISS)", "Data Scientist", "Public Policy Analyst"
+  karmayogiId: string; // for official: Karmayogi ID, for student: Student ID / Roll No.
   completedHours: number;
   allocatedHours: number;
   certificatesEarned: number;

@@ -4,8 +4,8 @@ import { ShieldCheck, Globe, LogIn, LogOut, User, ChevronDown, Sparkles } from "
 
 interface GovHeaderProps {
   currentProfile: OfficialProfile;
-  profiles: OfficialProfile[];
-  onSelectProfile: (profile: OfficialProfile) => void;
+  profiles?: OfficialProfile[];
+  onSelectProfile?: (profile: OfficialProfile) => void;
   isAuthenticated: boolean;
   onOpenSignIn: () => void;
   onOpenProfile: () => void;
@@ -103,13 +103,19 @@ export const GovHeader: React.FC<GovHeaderProps> = ({
               <button
                 onClick={onOpenProfile}
                 className="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-amber-200 px-2.5 py-0.5 rounded border border-slate-700 transition text-[11px] font-medium cursor-pointer shadow-xs"
-                title="View & Edit Official Profile"
+                title="View & Edit Profile"
               >
                 <div className="w-4 h-4 rounded-full bg-amber-400 text-slate-950 flex items-center justify-center font-bold text-[9px]">
                   {currentProfile.name.split(" ")[1]?.[0] || currentProfile.name[0]}
                 </div>
                 <span className="max-w-[130px] truncate">{currentProfile.name}</span>
-                <span className="text-[10px] bg-blue-900 text-blue-200 px-1 py-0.2 rounded font-bold">Profile</span>
+                <span className={`text-[10px] px-1.5 py-0.2 rounded font-bold ${
+                  currentProfile.userType === "student"
+                    ? "bg-emerald-900 text-emerald-200"
+                    : "bg-blue-900 text-blue-200"
+                }`}>
+                  {currentProfile.userType === "student" ? "Student" : "Profile"}
+                </span>
               </button>
 
               <button

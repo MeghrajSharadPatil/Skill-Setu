@@ -5,6 +5,7 @@ export const INITIAL_OFFICIAL_PROFILES: OfficialProfile[] = [
     id: "prof-1",
     name: "Dr. Rajesh Kumar Sharma",
     email: "rajesh.sharma.iss@gov.in",
+    userType: "official",
     designation: "Senior Statistical Officer (SSO)",
     cadre: "Subordinate Statistical Service (SSS)",
     department: "National Sample Survey (NSS) - Survey Design & Research Division (SDRD)",
@@ -22,6 +23,7 @@ export const INITIAL_OFFICIAL_PROFILES: OfficialProfile[] = [
     id: "prof-2",
     name: "Smt. Priya Sundaram",
     email: "priya.sundaram.iss@gov.in",
+    userType: "official",
     designation: "Junior Statistical Officer (JSO)",
     cadre: "Subordinate Statistical Service (SSS)",
     department: "Price Statistics Division (PSD) - Consumer Price Index Section",
@@ -39,6 +41,7 @@ export const INITIAL_OFFICIAL_PROFILES: OfficialProfile[] = [
     id: "prof-3",
     name: "Shri Amitav Mukherjee",
     email: "amitav.mukherjee@nic.in",
+    userType: "official",
     designation: "Deputy Director (National Accounts)",
     cadre: "Indian Statistical Service (ISS)",
     department: "National Accounts Division (NAD) - GVA Compilation Wing",
@@ -51,6 +54,24 @@ export const INITIAL_OFFICIAL_PROFILES: OfficialProfile[] = [
     completedHours: 54.0,
     allocatedHours: 70,
     certificatesEarned: 8,
+  },
+  {
+    id: "prof-student-1",
+    name: "Aakash Varma",
+    email: "aakash.varma.stat@univ.edu.in",
+    userType: "student",
+    designation: "M.Sc. Statistics Student & ISS Aspirant",
+    cadre: "Student (Undergraduate/Postgraduate)",
+    department: "Department of Statistics & Operations Research",
+    ministry: "Delhi University / Central University of Statistical Sciences",
+    currentAssignment: "Survey Sampling Theory, Econometric Modeling & CSIR-UGC NET / ISS Prep",
+    experienceYears: 2,
+    education: "B.Sc. (Hons) Statistics, pursuing M.Sc. Statistics",
+    targetRole: "Indian Statistical Service (ISS) Officer / Public Sector Data Scientist",
+    karmayogiId: "STU-DU-2024-8831",
+    completedHours: 18.0,
+    allocatedHours: 45,
+    certificatesEarned: 2,
   },
 ];
 
@@ -192,7 +213,7 @@ export const INITIAL_SKILLS: SkillItem[] = [
   },
   {
     id: "gov-2",
-    name: "Government Cloud (MeghRaj) & Cyber Security",
+    name: "Government Cloud Infrastructure & Cyber Security",
     domain: "Digital Governance",
     description: "Secure data pipelines, CERT-In guidelines, zero trust architecture, and cloud data sovereignty.",
     currentLevel: 2.8,
@@ -314,7 +335,7 @@ export const IGOT_COURSE_CATALOGUE: IGOTCourse[] = [
     format: "Virtual Lab",
     description: "Hands-on virtual lab on using Pandas, Polars, and BeautifulSoup for high-frequency commodity price monitoring, cleaning microdata files, and automated report generation.",
     syllabus: [
-      "Python Environment Setup on Government Cloud (NIC / MeghRaj)",
+      "Python Environment Setup on Government Cloud (NIC / MeitY)",
       "High-speed Microdata Manipulation with Pandas & Polars",
       "Automated Price Web Scraping from e-Commerce and Mandi Portals",
       "Validation Rules Automation (Range checks, Logical inconsistencies)",
@@ -356,7 +377,7 @@ export const IGOT_COURSE_CATALOGUE: IGOTCourse[] = [
     titleHindi: "लोक सेवकों के लिए डिजिटल व्यक्तिगत डेटा संरक्षण (डीपीडीपी) अधिनियम 2023",
     provider: "iGOT Karmayogi Bharat",
     category: "Digital Governance",
-    competencyMapped: ["Data Privacy & DPDP Act 2023 Compliance", "Government Cloud (MeghRaj) & Cyber Security"],
+    competencyMapped: ["Data Privacy & DPDP Act 2023 Compliance", "Government Cloud Infrastructure & Cyber Security"],
     level: "Basic",
     durationHours: 6.0,
     rating: 4.8,
@@ -568,7 +589,7 @@ Under SNA 2008, Research and Development (R&D) expenditures and software expendi
     sourceDoc: "NSSTA Center of Excellence in Big Data & Analytics",
     wordCount: 810,
     excerpt: `1. Transition from Legacy SPSS/Stata to Open Source Data Science:
-To accommodate massive microdata datasets like the Periodic Labour Force Survey (PLFS) and Annual Survey of Industries (ASI), MoSPI is deploying Python (Polars/Pandas) and R on secure government cloud infrastructure (MeghRaj).
+To accommodate massive microdata datasets like the Periodic Labour Force Survey (PLFS) and Annual Survey of Industries (ASI), MoSPI is deploying Python (Polars/Pandas) and R on secure government cloud infrastructure (NIC National Data Centre).
 2. Automated Validation and Scrutiny:
 Using vectorized operations in Python, automated scrutiny routines flag data entry errors, invalid occupation codes (NCO-2015), and extreme outlier expenditures in seconds:
 \`\`\`python

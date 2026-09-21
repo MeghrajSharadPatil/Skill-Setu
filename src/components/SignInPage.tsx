@@ -179,28 +179,38 @@ export const SignInPage: React.FC<SignInPageProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#040D1B] via-[#0B2545] to-[#041122] text-slate-100 flex flex-col justify-between relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col justify-between relative overflow-hidden font-sans">
       
       {/* Background Ambience & Grid Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(#1E3A8A_1px,transparent_1px)] [background-size:24px_24px] opacity-25 pointer-events-none"></div>
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(#CBD5E1_1px,transparent_1px)] [background-size:24px_24px] opacity-60 pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-blue-100/60 rounded-full blur-3xl pointer-events-none"></div>
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-amber-100/50 rounded-full blur-3xl pointer-events-none"></div>
 
       {/* 1. Official Top Gov Bar */}
-      <header className="relative z-10 w-full bg-[#051329]/90 border-b border-slate-800 backdrop-blur-md">
+      <header className="relative z-10 w-full bg-[#0B4F9C] text-white shadow-xs">
         <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between">
           <div className="flex items-center space-x-2.5">
-            <div className="w-8 h-8 rounded-full border border-amber-400/40 p-1 flex items-center justify-center bg-blue-950 shadow-xs">
-              <ShieldCheck className="w-5 h-5 text-amber-400" />
+            <div className="w-8 h-8 rounded-full border border-amber-300/40 p-1 flex items-center justify-center bg-blue-900/60 shadow-xs">
+              <ShieldCheck className="w-5 h-5 text-amber-300" />
             </div>
             <div>
               <div className="text-[10px] font-bold tracking-wider uppercase text-amber-300">
                 भारत सरकार • Government of India
               </div>
-              <div className="text-xs text-slate-300 font-medium hidden sm:block">
+              <div className="text-xs text-white/95 font-medium hidden sm:block">
                 Ministry of Statistics & Programme Implementation (MoSPI)
               </div>
             </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <button
+              onClick={() => setLanguage(language === "en" ? "hi" : "en")}
+              className="px-2.5 py-1 text-xs font-bold bg-white/10 hover:bg-white/20 text-white rounded border border-white/20 transition cursor-pointer"
+              title="Toggle Hindi / English"
+            >
+              {language === "en" ? "हिन्दी" : "English"}
+            </button>
           </div>
         </div>
 
@@ -214,50 +224,50 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
       {/* 2. Main Authentication Card Area */}
       <main className="relative z-10 flex-1 flex items-center justify-center p-4 sm:p-6 my-6">
-        <div className="max-w-4xl w-full bg-slate-900/90 rounded-3xl border border-slate-700/80 shadow-2xl backdrop-blur-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+        <div className="max-w-4xl w-full bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12">
           
           {/* Left Column: Brand & Security Context (5 cols) */}
-          <div className="lg:col-span-5 bg-gradient-to-br from-[#0B2545] via-[#081C38] to-[#040E1E] p-6 sm:p-8 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-800 relative">
+          <div className="lg:col-span-5 bg-gradient-to-br from-blue-50/90 via-slate-50 to-amber-50/50 p-6 sm:p-8 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-slate-200 relative">
             <div>
               {/* Badge */}
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-bold mb-4">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-100 border border-amber-300/80 text-amber-900 text-xs font-bold mb-4">
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                 <span>iGOT Karmayogi & NSSTA</span>
               </div>
 
               {/* Title & Setu */}
-              <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-2">
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight mb-1">
                 SkillSetu
               </h1>
-              <div className="text-lg font-serif text-amber-300 mb-3" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
+              <div className="text-lg font-serif text-amber-700 mb-3" style={{ fontFamily: "'Tiro Devanagari Hindi', serif" }}>
                 स्किलसेतु • आधिकारिक पोर्टल
               </div>
               
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed mb-6">
+              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-6">
                 {language === "hi"
                   ? "भारतीय आधिकारिक सांख्यिकी तंत्र हेतु राष्ट्रीय योग्यता निदान, स्वचालित iGOT कर्मयोगी आवंटन एवं संवर्ग उन्नति मंच।"
-                  : "National Statistical Competency Diagnostics, Adaptive MCQ Engine, and Personalized Learning Pathways for India's Statistical Officers."}
+                  : "National Statistical Competency Diagnostics, Adaptive MCQ Engine, and Personalized Learning Pathways for India's Statistical Officers & Scholars."}
               </p>
 
               {/* Features List */}
-              <div className="space-y-3 text-xs text-slate-300">
+              <div className="space-y-3 text-xs text-slate-700">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   </div>
-                  <span>Cadre-benchmarked competency diagnostic tests</span>
+                  <span>Cadre & academic-benchmarked diagnostic tests</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-sky-500/20 text-sky-400 flex items-center justify-center shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-blue-100 text-[#0B4F9C] flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   </div>
                   <span>6,500+ TPAC-recommended iGOT courses</span>
                 </div>
                 <div className="flex items-center gap-2.5">
-                  <div className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <div className="w-5 h-5 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
                     <CheckCircle2 className="w-3.5 h-3.5" />
                   </div>
-                  <span>AI Sahayak statistical copilot for official duties</span>
+                  <span>AI Sahayak statistical copilot for official & research duties</span>
                 </div>
               </div>
 
@@ -265,25 +275,25 @@ export const SignInPage: React.FC<SignInPageProps> = ({
               <button
                 type="button"
                 onClick={onOpenWelcome}
-                className="mt-6 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-400/50 text-amber-300 text-xs font-semibold transition cursor-pointer"
+                className="mt-6 inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 border border-slate-300 text-slate-800 text-xs font-semibold transition cursor-pointer shadow-xs"
               >
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
                 <span>About SkillSetu & Mission</span>
               </button>
             </div>
           </div>
 
           {/* Right Column: Sign In Forms (7 cols) */}
-          <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center">
+          <div className="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-center bg-white">
             
             <div className="mb-4">
-              <div className="text-[11px] font-bold tracking-wider text-amber-400 uppercase">
-                Secure Cadre Access
+              <div className="text-[11px] font-bold tracking-wider text-[#0B4F9C] uppercase">
+                Secure Portal Access
               </div>
-              <h2 className="text-xl sm:text-2xl font-black text-white mt-0.5">
+              <h2 className="text-xl sm:text-2xl font-black text-slate-900 mt-0.5">
                 {authMode === "signin" ? "Sign in" : "Sign up"}
               </h2>
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-slate-500 mt-1">
                 {authMode === "signin" 
                   ? "Authenticate with your official email credentials or Google Single Sign-On."
                   : "Register with email to access competency diagnostics & personalized learning pathways."}
@@ -291,7 +301,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             </div>
 
             {/* Mode Switcher Tabs */}
-            <div className="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700/80 mb-5">
+            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 mb-5">
               <button
                 type="button"
                 onClick={() => {
@@ -302,8 +312,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                 }}
                 className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
                   authMode === "signin"
-                    ? "bg-[#0B4F9C] text-white shadow-sm"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-[#0B4F9C] text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <LogIn className="w-3.5 h-3.5" />
@@ -320,8 +330,8 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                 }}
                 className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition cursor-pointer flex items-center justify-center gap-1.5 ${
                   authMode === "signup"
-                    ? "bg-emerald-700 text-white shadow-sm"
-                    : "text-slate-400 hover:text-white"
+                    ? "bg-emerald-700 text-white shadow-xs"
+                    : "text-slate-600 hover:text-slate-900"
                 }`}
               >
                 <UserPlus className="w-3.5 h-3.5" />
@@ -333,15 +343,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
             {statusMessage && (
               <div className={`mb-4 p-3 rounded-xl text-xs flex items-center gap-2 animate-in fade-in duration-200 ${
                 statusMessage.type === "success" 
-                  ? "bg-emerald-950/80 border border-emerald-700/80 text-emerald-200" 
+                  ? "bg-emerald-50 border border-emerald-200 text-emerald-900" 
                   : statusMessage.type === "error"
-                  ? "bg-rose-950/80 border border-rose-700/80 text-rose-200"
-                  : "bg-blue-950/80 border border-blue-700/80 text-blue-200"
+                  ? "bg-rose-50 border border-rose-200 text-rose-800"
+                  : "bg-blue-50 border border-blue-200 text-blue-900"
               }`}>
                 {statusMessage.type === "success" ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 ) : (
-                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <AlertCircle className="w-4 h-4 shrink-0 text-blue-600" />
                 )}
                 <span>{statusMessage.text}</span>
               </div>
@@ -353,7 +363,7 @@ export const SignInPage: React.FC<SignInPageProps> = ({
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isLoading}
-                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 transition shadow-md hover:shadow-lg cursor-pointer border border-slate-200 active:scale-[0.99]"
+                className="w-full py-2.5 px-4 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 transition shadow-xs hover:shadow-sm cursor-pointer border border-slate-300 active:scale-[0.99]"
               >
                 {/* Google SVG Logo */}
                 <svg className="w-4.5 h-4.5" viewBox="0 0 24 24">
@@ -380,11 +390,11 @@ export const SignInPage: React.FC<SignInPageProps> = ({
 
             {/* Separator */}
             <div className="relative flex py-1 items-center mb-5">
-              <div className="flex-grow border-t border-slate-700"></div>
-              <span className="flex-shrink mx-3 text-slate-400 text-[11px] font-semibold uppercase tracking-wider">
+              <div className="flex-grow border-t border-slate-200"></div>
+              <span className="flex-shrink mx-3 text-slate-500 text-[11px] font-semibold uppercase tracking-wider">
                 {authMode === "signin" ? "Or Sign In with Email / Supabase" : "Or Register with Supabase"}
               </span>
-              <div className="flex-grow border-t border-slate-700"></div>
+              <div className="flex-grow border-t border-slate-200"></div>
             </div>
 
             {/* 2. Form Component (SignIn or SignUp) */}
@@ -411,15 +421,15 @@ export const SignInPage: React.FC<SignInPageProps> = ({
       </main>
 
       {/* 3. Official Footer */}
-      <footer className="relative z-10 w-full bg-[#030A14] border-t border-slate-800 py-3 text-center text-[11px] text-slate-400">
+      <footer className="relative z-10 w-full bg-white border-t border-slate-200 py-3.5 text-center text-[11px] text-slate-600">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div>
             National Statistical Systems Training Academy (NSSTA), Plot No. 22, Knowledge Park-II, Greater Noida
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 text-slate-500">
             <span>MoSPI © 2026</span>
             <span>•</span>
-            <span className="text-amber-400">Integrated with iGOT Karmayogi Bharat</span>
+            <span className="text-amber-700 font-semibold">Integrated with iGOT Karmayogi Bharat</span>
           </div>
         </div>
       </footer>

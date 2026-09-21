@@ -89,16 +89,16 @@ export const SignUp: React.FC<SignUpProps> = ({
     <div className="w-full">
       {/* Informational Notification */}
       {infoMessage && (
-        <div className="mb-4 p-3 rounded-xl text-xs flex items-center gap-2 bg-blue-950/80 border border-blue-700/80 text-blue-200">
-          <CheckCircle2 className="w-4 h-4 text-blue-400 shrink-0" />
+        <div className="mb-4 p-3 rounded-xl text-xs flex items-center gap-2 bg-blue-50 border border-blue-200 text-blue-900">
+          <CheckCircle2 className="w-4 h-4 text-blue-600 shrink-0" />
           <span>{infoMessage}</span>
         </div>
       )}
 
       <form onSubmit={handleSignUp} className="space-y-3.5">
         <div>
-          <label className="block text-xs font-bold text-slate-300 mb-1">
-            Officer Full Name (Optional)
+          <label className="block text-xs font-bold text-slate-700 mb-1">
+            Full Name (Optional)
           </label>
           <div className="relative">
             <User className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -106,14 +106,14 @@ export const SignUp: React.FC<SignUpProps> = ({
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-xs font-medium text-white placeholder-slate-500 focus:ring-2 focus:ring-amber-400 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#0B4F9C]/20 focus:border-[#0B4F9C] focus:outline-none transition"
               placeholder="e.g. Dr. Rajesh Kumar Sharma"
             />
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-300 mb-1">
+          <label className="block text-xs font-bold text-slate-700 mb-1">
             Email Address
           </label>
           <div className="relative">
@@ -122,8 +122,8 @@ export const SignUp: React.FC<SignUpProps> = ({
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-xs font-medium text-white placeholder-slate-500 focus:ring-2 focus:ring-amber-400 focus:outline-none"
-              placeholder="name@mospi.gov.in"
+              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#0B4F9C]/20 focus:border-[#0B4F9C] focus:outline-none transition"
+              placeholder="name@mospi.gov.in or student@university.edu"
               required
             />
           </div>
@@ -131,10 +131,10 @@ export const SignUp: React.FC<SignUpProps> = ({
 
         <div>
           <div className="flex items-center justify-between mb-1">
-            <label className="block text-xs font-bold text-slate-300">
+            <label className="block text-xs font-bold text-slate-700">
               Create Password
             </label>
-            <span className="text-[10px] text-slate-400 font-medium">Min. 6 characters</span>
+            <span className="text-[10px] text-slate-500 font-medium">Min. 6 characters</span>
           </div>
           <div className="relative">
             <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
@@ -142,7 +142,7 @@ export const SignUp: React.FC<SignUpProps> = ({
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 bg-slate-800/90 border border-slate-700 rounded-xl text-xs font-medium text-white placeholder-slate-500 focus:ring-2 focus:ring-amber-400 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#0B4F9C]/20 focus:border-[#0B4F9C] focus:outline-none transition"
               placeholder="••••••••••••"
               required
             />
@@ -152,28 +152,28 @@ export const SignUp: React.FC<SignUpProps> = ({
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-md cursor-pointer border border-emerald-400/30 active:scale-[0.99] disabled:opacity-50"
+          className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition shadow-sm hover:shadow cursor-pointer active:scale-[0.99] disabled:opacity-50"
         >
           <UserPlus className="w-4 h-4" />
           <span>{isLoading ? "Creating Account..." : "Create Account"}</span>
         </button>
 
-        {/* Simple error handling under the form */}
+        {/* Error handling under the form */}
         {errorMessage && (
-          <p className="mt-2 text-xs text-rose-400 flex items-center gap-1.5 font-medium animate-in fade-in duration-200">
-            <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+          <div className="mt-2 p-2.5 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-center gap-2 font-medium animate-in fade-in duration-200">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
             <span>{errorMessage}</span>
-          </p>
+          </div>
         )}
       </form>
 
       <div className="mt-4 text-center">
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-slate-600">
           Already have an account?{" "}
           <button
             type="button"
             onClick={onSwitchToSignIn}
-            className="text-amber-400 font-bold hover:underline cursor-pointer"
+            className="text-[#0B4F9C] font-bold hover:underline cursor-pointer"
           >
             Sign In here
           </button>
